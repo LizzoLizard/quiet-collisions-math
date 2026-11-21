@@ -1,5 +1,5 @@
 """Exhaustive tests of the low-wire collision bound and bilinear cut interfaces."""
-from itertools import combinations
+from itertools import combinations, combinations_with_replacement
 from random import Random
 
 from mask_recovery import dot, mix
@@ -85,6 +85,104 @@ def ring(n, d):
     return first, histogram.count(0), histogram.count(2), excess
 
 
+def anf_coefficients(values):
+    """Subset Möbius inversion in GF(2), processing every output bit at once."""
+    coeffs = list(values)
+    step = 1
+    while step < len(coeffs):
+        for start in range(0, len(coeffs), 2 * step):
+            for i in range(start, start + step):
+                coeffs[i + step] ^= coeffs[i]
+        step *= 2
+    return coeffs
+
+
+def check_grouped_ring(n, k, d):
+    length = max((n + k - 1) // k, d + 1)
+    control_count = n - length
+    ring_mask = (1 << length) - 1
+    all_controls = (1 << control_count) - 1
+    groups = []
+    for edge in range(length):
+        start = edge * (k - 1)
+        size = min(k - 1, max(control_count - start, 0))
+        groups.append(((1 << size) - 1) << start)
+
+    values, histogram = [], [0] * (1 << n)
+    for word in range(1 << n):
+        controls, wires = word >> length, word & ring_mask
+        output = controls << length
+        for i, group in enumerate(groups):
+            gain = int(controls & group == group)
+            following = (wires >> ((i + 1) % length)) & 1
+            this = (wires >> i) & 1
+            output |= (following ^ (this & gain)) << i
+        values.append(output)
+        histogram[output] += 1
+
+    for y, count in enumerate(histogram):
+        expected = 1
+        if y >> length == all_controls:
+            expected += (-1) ** weight(y & ring_mask)
+        assert count == expected, (n, k, d, y)
+    assert sum(t * (t - 1) for t in histogram) == 1 << length
+    for mask, coefficient in enumerate(transform(histogram)):
+        expected = 0
+        if mask == 0:
+            expected = 1 << n
+        elif mask & ring_mask == ring_mask:
+            expected = (1 << length) * (-1) ** weight(mask >> length)
+        assert coefficient == expected, (n, k, d, mask)
+
+    coeffs = anf_coefficients(values)
+    for wire in range(n):
+        degree = max((weight(a) for a, v in enumerate(coeffs) if v & (1 << wire)), default=0)
+        expected = 1 if wire >= length else 1 + weight(groups[wire])
+        if n == 1:
+            expected = 0  # The sole output is r XOR r.
+        assert degree == expected and degree <= k, (n, k, d, wire)
+
+
+def check_tiny_minima():
+    """Enumerate all maps up to output translations and coordinate permutations.
+
+    Both symmetries preserve degree, collision excess, and the weights of
+    audible masks. Normalizing Q(0)=0 and sorting the coordinate truth tables
+    leaves a representative of every map.
+    """
+    reps = 0
+    for n in range(1, 4):
+        count = 1 << n
+        coords = []
+        for table in range(0, 1 << count, 2):
+            bits = [(table >> i) & 1 for i in range(count)]
+            degree = max((weight(a) for a, v in enumerate(anf_coefficients(bits)) if v), default=0)
+            coords.append((bits, degree))
+        minima = {}
+        for rows in combinations_with_replacement(coords, n):
+            reps += 1
+            degree = max(deg for bits, deg in rows)
+            words = [0] * count
+            for j, (bits, _) in enumerate(rows):
+                for x, bit in enumerate(bits):
+                    words[x] |= bit << j
+            hist = [0] * count
+            for y in words:
+                hist[y] += 1
+            excess = sum(t * (t - 1) for t in hist)
+            if excess == 0:
+                continue
+            first = min(weight(c) for c, value in enumerate(transform(hist)) if c and value)
+            for k in range(max(1, degree), n + 3):
+                for d in range(first):
+                    key = k, d
+                    minima[key] = min(minima.get(key, excess), excess)
+        for k in range(1, n + 3):
+            for d in range(n):
+                assert minima[k, d] == 1 << max((n + k - 1) // k, d + 1), (n, k, d)
+    return reps
+
+
 def factor_rows(rows):
     """Return independent original rows and the coefficients of all rows in them."""
     pivots, basis, coordinates = {}, [], []
@@ -159,6 +257,15 @@ if __name__ == '__main__':
     for n, d in ((10, 1), (10, 4), (10, 7), (11, 4)):
         first, empty, double, excess = ring(n, d)
         print(f"N={n}, d={d}: first weight {first}, {empty} empty, {double} double, excess {excess}")
+    grouped = 0
+    for n in range(1, 11):
+        for k in range(1, n + 3):
+            for d in range(n):
+                check_grouped_ring(n, k, d)
+                grouped += 1
+    print(f"{grouped} grouped rings through 10 bits matched every bucket, signed mask, and coordinate degree.")
+    reps = check_tiny_minima()
+    print(f"Exhaustive minima through 3 bits matched the formula ({reps} square-map symmetry representatives).")
     rng = Random(20261121)
     assert cut_test([255] * 8, 8, rng) == 1
     assert cut_test([1 << i for i in range(8)], 8, rng) == 8

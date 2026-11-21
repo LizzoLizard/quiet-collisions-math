@@ -225,8 +225,8 @@ theorem probe_bounds (Q : W n → W n) (c : W n) (nz : c ≠ zero n) :
   simp only [twice_total,excess,t] at l u
   exact ⟨l,u⟩
 
-theorem quadratic_excess (Q : W n → W n) (rep : ∀ c, ∃ q : Quad n, walsh Q c = countBias n q)
-    (collision : many n < collisions Q) : many ((n+1)/2) ≤ collisions Q - many n := by
+theorem divisibility_excess (Q : W n → W n) (m : Nat) (div : ∀ c, many m ∣ walsh Q c)
+    (collision : many n < collisions Q) : many m ≤ collisions Q - many n := by
   classical
   have ex : ∃ c, offZero Q c ≠ 0 := by
     by_cases h : ∃ c, offZero Q c ≠ 0
@@ -241,11 +241,8 @@ theorem quadratic_excess (Q : W n → W n) (rep : ∀ c, ∃ q : Quad n, walsh Q
   have nz : c ≠ zero n := by intro z; subst c; simp [offZero] at h
   simp only [offZero,nz,if_false] at h
   have b := probe_bounds Q c nz
-  obtain ⟨q,eq⟩ := rep c
-  obtain ⟨z,hz⟩ := quadratic_divisibility n ((n+1)/2) q (by omega)
-  let p := many ((n+1)/2)
-  have wp : walsh Q c = p*z := eq.trans hz
-  have pp : 0 ≤ p := many_nonneg _
+  obtain ⟨z,wp⟩ := div c
+  have pp : 0 ≤ many m := many_nonneg _
   by_cases zero : z = 0
   · simp [zero] at wp; contradiction
   · by_cases pos : 1 ≤ z
@@ -253,6 +250,14 @@ theorem quadratic_excess (Q : W n → W n) (rep : ∀ c, ∃ q : Quad n, walsh Q
       simp only [Int.mul_one] at bound; omega
     · have bound := Int.mul_le_mul_of_nonneg_left (show z ≤ -1 by omega) pp
       simp at bound; omega
+
+theorem quadratic_excess (Q : W n → W n) (rep : ∀ c, ∃ q : Quad n, walsh Q c = countBias n q)
+    (collision : many n < collisions Q) : many ((n+1)/2) ≤ collisions Q - many n := by
+  apply divisibility_excess Q _ _ collision
+  intro c
+  obtain ⟨q,e⟩ := rep c
+  rw [e]
+  exact quadratic_divisibility n ((n+1)/2) q (by omega)
 
 theorem quiet_excess (Q : W n → W n) (d : Nat) (collision : many n < collisions Q)
     (quiet : ∀ c, weight n c ≤ d → offZero Q c = 0) :

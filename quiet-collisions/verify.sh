@@ -6,11 +6,12 @@ cd "$(dirname "$0")"
 build=$(mktemp -d)
 trap 'rm -rf "$build"' EXIT
 lean --version
-for f in FrozenShells FreezeMovies CandyKnots CollisionLaw MaskRecovery CollisionCircuit SilentRoom; do
+for f in FrozenShells FreezeMovies CandyKnots CollisionLaw MaskRecovery CollisionCircuit \
+         SilentRoom RingCracks DegreeDivisibility CubePermutation GroupedRing; do
   echo "== $f"
   LEAN_PATH="$build" lean -o "$build/$f.olean" "lean/$f.lean"
 done
-echo "== RingCracks"
-LEAN_PATH="$build" lean lean/RingCracks.lean
+echo "== ExactCollisionMinimum"
+LEAN_PATH="$build" lean lean/ExactCollisionMinimum.lean
 echo "== Python checks"
 python3 -B checks/quiet_cut_runs.py

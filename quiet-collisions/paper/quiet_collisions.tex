@@ -18,7 +18,7 @@
 \newcommand{\Coll}{\mathrm{C}}
 \newcommand{\one}{\mathbf{1}}
 
-\title{The exact collision cost of low-weight uniformity\\ for quadratic maps over $\F$}
+\title{The exact collision cost of low-weight uniformity\\ for polynomial maps over $\F$}
 \author{Ayomide (Daniel) Shittu}
 \date{Draft, November 2026}
 
@@ -26,20 +26,19 @@
 \maketitle
 
 \begin{abstract}
-Let $Q\colon\F^N\to\F^N$ be a map whose coordinates have algebraic degree at
-most two, and suppose that the output $Q(U)$ on a uniform input $U$ is $d$-wise
-uniform but $Q$ is not a bijection. We determine exactly the least possible
-number of ordered collisions $\Coll(Q)=\#\{(x,x') : Q(x)=Q(x')\}$:
+Let $Q\colon\F^N\to\F^N$ have algebraic degree at most $k$ in each
+coordinate. If $Q$ is not a bijection and its output on uniform input is
+$d$-wise uniform, the least possible excess in its ordered collision count is
 \[
-  \min\bigl(\Coll(Q)-2^N\bigr) \;=\; 2^{\max(\lceil N/2\rceil,\; d+1)}
-  \qquad (0\le d<N).
+  \min_Q\bigl(\Coll(Q)-2^N\bigr)
+    =2^{\max(\lceil N/k\rceil,\,d+1)}
+    \qquad(k\ge1,\ 0\le d<N).
 \]
-The lower bound combines two classical facts, the dual-distance bound for
-functions with vanishing low-weight Fourier coefficients and the divisibility of
-quadratic Walsh coefficients by $2^{\lceil N/2\rceil}$. Our contribution is the
-observation that the larger of the two bounds is always attained, by an explicit
-``ring'' of quadratic gates. The main theorem has been formally verified in
-Lean~4.
+A support bound gives the exponent $d+1$, and divisibility of Boolean
+polynomial signed sums gives $\lceil N/k\rceil$. A ring with up to $k-1$
+control bits on each edge attains both constraints simultaneously. We give
+the quadratic case first, then prove the general result. Lean~4 verifies the
+minimum, including the degree of the attaining map.
 \end{abstract}
 
 \paragraph{A note on this document.}
@@ -57,8 +56,7 @@ uniformity} (every $d$ output coordinates are jointly uniform) and \emph{low
 collision count}. For arbitrary maps, these interact only through a
 coding-theoretic support bound. For maps of algebraic degree two, a second
 constraint appears: Walsh coefficients of quadratic functions are coarsely
-quantised. This note shows that these two constraints together determine
-the exact minimum collision excess, and that nothing else does.
+quantised. Theorem~\ref{thm:main} gives the quadratic minimum. Theorem~\ref{thm:all-degrees} extends it to every positive degree bound.
 
 \paragraph{Notation.}
 For $c,y\in\F^N$ write $c\cdot y=\sum_i c_iy_i$ and $\wt(c)$ for the Hamming
@@ -121,10 +119,11 @@ Let $f\colon\F^n\to\mathbb{Z}$ be nonzero with $\hat f(c)=0$ for all
 $\wt(c)<k$. Then $|\operatorname{supp} f|\ge 2^k$.
 \end{lemma}
 
-This is the well-known statement that the dual of the degree-$(n-k)$ Reed--Muller
-space has minimum distance $2^k$; equivalently, it is the minimum support of a
-$(k-1)$-wise uniform signed measure~\cite{Delsarte73,MacWilliamsSloane,ODonnell}. For
-completeness, here is a direct proof.
+Multiplication by the full parity character sends each Fourier mask to its
+complement. For $k\le n$ this gives a function of real multilinear degree at
+most $n-k$ with the same support. In coding-theoretic terms this is a cube
+support bound~\cite{Delsarte73,MacWilliamsSloane,ODonnell}. We prove it
+directly below.
 
 \begin{proof}
 Induction on $n$. If $n=0$, then $f$ is a nonzero constant and $\hat f(0)=f\ne0$,
@@ -221,7 +220,7 @@ with $|f|=1$, so $\Coll(R)-2^N=2^m$ by~\eqref{eq:excess}. Its transform is
   \hat f(a,b)=(-1)^{\wt(a)}\sum_{e\in\F^m}(-1)^{(b+\one)\cdot e}
   =(-1)^{\wt(a)}\,2^m\,[\,b=\one\,].
 \]
-Hence $\W_R(a,b)=0$ unless $b=\one$, and every audible mask has weight at least
+Hence every nonconstant audible mask has $b=\one$ and weight at least
 $m\ge d+1$. So $R$ is silent through $d$, is not a bijection, and attains
 $2^{\max(\lceil N/2\rceil,d+1)}$.
 \end{proof}
@@ -236,22 +235,79 @@ $N=10$ and $d=4$ give $m=5$: $16$ double and $16$ empty buckets, every mask of
 weight at most $4$ silent, and $\W_R(0,\one)=32$.
 \end{remark}
 
+\section{All positive degree bounds}\label{sec:all-degrees}
+
+\begin{theorem}\label{thm:all-degrees}
+For $k\ge1$ and $0\le d<N$, put $L=\max(\lceil N/k\rceil,d+1)$.
+Among all square maps of coordinate degree at most $k$ that are silent
+through $d$ and fail to be bijections, the minimum of $\Coll(Q)-2^N$ is $2^L$.
+\end{theorem}
+
+\begin{proof}
+For the degree bound we use the signed-sum form of McEliece
+divisibility~\cite{McEliece72}. Write a Boolean polynomial $g$ as a sum
+modulo two of squarefree monomials $p$, each of degree at most $k$. Expand
+$(-1)^{g(x)}=\prod_p(1-2p(x))$ over the integers. A term selecting $s$
+monomials covers $u\le ks$ distinct variables. Its product equals one on
+$2^{N-u}$ inputs, so it contributes $(-2)^s2^{N-u}$ to the signed sum.
+Since $k(s+N-u)\ge u+(N-u)=N$, every term is divisible by
+$2^{\lceil N/k\rceil}$. This applies to each $g=c\cdot Q$.
+For a non-bijection some nonconstant coefficient is nonzero, and its
+magnitude is at most $\sum_y f(y)^2$. Combining this degree bound with
+Lemma~\ref{lem:support} gives $\Coll(Q)-2^N\ge2^L$.
+
+For attainment, place $L$ wires on the ring and copy the $M=N-L$ controls
+to the output. The inequality $N\le kL$ gives $M\le L(k-1)$. Partition
+all $M$ controls into $L$ groups $S_i$ of size at most $k-1$, allowing
+empty groups. Return the discrepancies
+\[
+  e_i=w_{i+1}+w_i\prod_{j\in S_i}t_j
+  \qquad (i\in\mathbb Z/L\mathbb Z),
+\]
+with empty product one. Every coordinate has degree at most $k$. A zero
+control makes its edge product zero, so Lemma~\ref{lem:ring} gives one
+preimage for every discrepancy word on that slice. On the all-ones control
+slice every edge product is one. Its $2^{L-1}$ even-parity outputs have two
+preimages each and its $2^{L-1}$ odd-parity outputs have none. The deviation
+is therefore $f(t,e)=[t=\one](-1)^{\wt(e)}$, with squared sum $2^L$.
+Its transform is
+\[
+  \hat f(a,b)=(-1)^{\wt(a)}2^L[\,b=\one\,].
+\]
+The mask on the $L$ ring outputs alone reads $+2^L$, and every nonconstant
+mask of smaller weight is silent. Since $d<L$, the ring attains the bound.
+\end{proof}
+
+This answers Question~2 of the quadratic draft. For instance, at $N=9$,
+$k=3$, and $d=2$, each of the three edges takes two controls. Four double
+buckets and four empty buckets give excess $8$. With the same $N,d$ the
+quadratic minimum is $32$. The construction also covers $L=1$ (the
+exceptional slice sends both wire values to zero) and $M=0$ (that slice
+is the whole input cube).
+
 \section{Formal verification}
-\begin{sloppypar}
 
-Theorem~\ref{thm:main} and Lemmas~\ref{lem:support}, \ref{lem:divisibility}
-and~\ref{lem:ring} are machine-checked in Lean~4.15.0~\cite{Lean4}, using only
-the core library (no Mathlib). The files are \texttt{SilentRoom.lean}
-(\texttt{quiet\_support}, \texttt{quadratic\_excess},
-\texttt{minimum\_excess\_bound}) and \texttt{RingCracks.lean}
-(\texttt{ring\_histogram}, \texttt{reduced\_spectrum}, \texttt{optimal\_ring}).
-Every theorem depends only on the standard axioms \texttt{propext},
-\texttt{Quot.sound} and \texttt{Classical.choice}. An independent Python script
-checks every bucket and every mask of the construction for all $78$ parameter
-pairs $(N,d)$ with $N\le 12$.
-\end{sloppypar}
+Lean~4.15.0~\cite{Lean4} checks the proofs using its core and standard libraries.
+For the quadratic case, \texttt{SilentRoom.lean} proves both lower bounds and
+\texttt{RingCracks.lean} gives the ring histogram and spectrum.
 
-\section{Questions}
+For Theorem~\ref{thm:all-degrees}, \texttt{DegreeDivisibility.lean} proves
+signed-sum divisibility from the monomial expansion and applies it to output
+parities. \texttt{GroupedRing.lean} verifies the histogram, spectrum, and
+coordinate degree of the same square map. \texttt{CubePermutation.lean}
+relates positive excess to failure of bijectivity. In
+\texttt{ExactCollisionMinimum.lean}, the theorem \texttt{exact\_minimum} gives
+an attaining witness and a lower bound for every admissible map. Its axiom
+report lists only \texttt{propext}, \texttt{Quot.sound}, and
+\texttt{Classical.choice}.
+
+Independent enumeration checks every bucket, signed coefficient, and coordinate
+degree for $495$ grouped rings through ten bits. Enumeration of all square maps
+through three bits also confirms the minima, using output translations and
+coordinate permutations to reduce the computation.
+
+
+\section{Status of the original questions}
 
 \begin{question}[rectangular maps]
 What is the minimum collision excess for quadratic $Q\colon\F^n\to\F^m$ with
@@ -259,11 +315,9 @@ $d$-wise uniform output, when $m<n$ (compression) or $m>n$ (stretch, as in
 low-degree generators~\cite{MST06})? The natural target is $\Coll(Q)-2^{2n-m}$.
 \end{question}
 
-\begin{question}[higher degree]
-By McEliece's theorem~\cite{McEliece72}, the Walsh coefficients of a degree-$k$ function on $n$
-variables are divisible by $2^{\lceil n/k\rceil}$. The same argument therefore
-gives $\Coll(Q)-2^N\ge 2^{\max(\lceil N/k\rceil,d+1)}$ for degree-$k$ maps. Is
-this tight?
+\begin{question}[higher degree, answered]
+Is the degree-$k$ lower bound tight? Theorem~\ref{thm:all-degrees} gives the
+exact minimum for every positive $k$.
 \end{question}
 
 \begin{question}[extremisers and robustness]

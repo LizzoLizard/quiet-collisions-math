@@ -1,0 +1,155 @@
+\documentclass[11pt]{article}
+\usepackage[margin=0.9in]{geometry}
+\usepackage{tikz}
+\usepackage{xcolor}
+\usepackage[hidelinks]{hyperref}
+\usepackage{enumitem}
+\definecolor{ink}{HTML}{1F2933}
+\definecolor{soft}{HTML}{D9DEE3}
+\definecolor{teal}{HTML}{0F766E}
+\definecolor{rose}{HTML}{BE123C}
+\color{ink}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{7pt}
+\tikzset{normal/.style={fill=soft}, double/.style={fill=teal}, empty/.style={fill=white, draw=rose, line width=0.7pt}}
+\newcommand{\key}[1]{\tikz[baseline=-0.6ex]\fill[#1] (0,-0.12) rectangle (0.24,0.12);}
+
+\begin{document}
+\pagestyle{empty}
+
+{\LARGE\bfseries Quiet Collisions}\\[3pt]
+{\large A small math result, explained without math}\\[2pt]
+{\small Ayomide (Daniel) Shittu \;·\; November 2026}
+
+\vspace{6pt}
+\section*{The story: a mail sorter}
+
+Picture a building with \textbf{1{,}024 people} and \textbf{1{,}024 mailboxes}.
+A sorting machine is supposed to give every person their own box. If the
+machine is faulty, some boxes get two people's mail and other boxes get none.
+I call each of these mix-ups a \emph{collision}.
+
+Every mailbox address is made of \textbf{10 yes/no labels}: east or west wing,
+upper or lower floor, front or back, and so on. Nobody can check all 1{,}024
+boxes, so inspectors take shortcuts. Each inspector picks \textbf{a few labels}
+and checks that the mail is spread evenly across them. For example, ``Do the
+east and west wings get the same amount of mail?''
+
+\textbf{The question:} can a broken machine pass every small inspection? If it
+can, how broken does it have to be?
+
+\section*{The answer}
+
+I found the exact answer, and it is the larger of two numbers:
+
+\begin{center}
+\fbox{\parbox{0.86\linewidth}{\centering\vspace{3pt}
+\textbf{Least possible damage} \;=\; the bigger of\\[3pt]
+\textbf{(1)} what it takes to fool inspectors who look at that many labels, and\\
+\textbf{(2)} what it takes to be broken at all, for a machine built from simple parts.
+\vspace{3pt}}}
+\end{center}
+
+\begin{itemize}[leftmargin=1.4em, itemsep=3pt]
+\item \textbf{Reason 1: hiding spreads the damage out.} To look balanced to
+every small inspection, the mistakes must be spread over many boxes. One or
+two wrong boxes would get caught.
+\item \textbf{Reason 2: simple machines can't make small mistakes.} A machine
+built from the simplest kind of parts is either perfect or noticeably off.
+There is no ``slightly broken.''
+\end{itemize}
+
+Here \emph{damage} means the number of wrong mailboxes, with a box that is
+off by more than one letter counting extra.
+
+The two reasons never interfere with each other. Whichever is stronger sets
+the answer. I also \textbf{built a machine that hits that minimum exactly}, so the
+answer can't be improved.
+
+\newpage
+\section*{What it looks like}
+
+Here is that machine for the 1{,}024-box building, with inspectors who may look
+at up to 4 labels at once. Each square is one mailbox.
+
+\begin{center}
+\begin{tikzpicture}
+\input{grid.tex}
+\end{tikzpicture}
+
+\vspace{4pt}
+\key{normal} one person's mail (correct) \qquad
+\key{double} two people's mail \qquad
+\tikz[baseline=-0.6ex]\draw[rose, line width=0.7pt, fill=white] (0,-0.12) rectangle (0.24,0.12); no mail
+\end{center}
+
+All the damage sits in one row: \textbf{16 boxes with double mail and 16
+empty ones}, in an alternating pattern. Every inspector who looks at 4 labels
+or fewer sees \emph{perfect balance}. Only an inspector who checks the right 5
+labels together sees the problem, and that inspector sees it plainly.
+That is the ``quiet'' in \emph{quiet collisions}: the machine is broken, but it
+stays silent under every small test.
+
+\textbf{How the minimum damage grows} as inspectors look at more labels at once
+(1{,}024-box building):
+
+\begin{center}
+\renewcommand{\arraystretch}{1.25}
+\begin{tabular}{l|cccccc}
+Labels each inspector checks & 0--4 & 5 & 6 & 7 & 8 & 9\\\hline
+Least damage that can still hide & 32 & 64 & 128 & 256 & 512 & 1{,}024
+\end{tabular}
+\end{center}
+
+Up to 4 labels, the answer is stuck at 32, because Reason 2 (simple parts)
+is the stronger one. From 5 labels on, Reason 1 takes over, and every extra
+label doubles the damage needed to hide. If inspectors check all 10 labels,
+nothing can hide: the machine must be perfect.
+
+\section*{Part 2: machines built from richer parts}
+
+The machine above uses the simplest kind of part, one that combines just two
+signals at a time. In part 2, I worked out the answer for machines whose parts
+combine \emph{any} number of signals, and the formula has the same shape. Richer
+parts can make smaller mistakes, so Reason 2 gets weaker and less damage can hide.
+With inspectors who check 2 labels, the least damage is 32 for two-signal parts,
+16 for three-signal parts and 8 for five-signal parts. Reason 1 never changes,
+and the same kind of ring machine still hits the minimum exactly.
+
+\section*{Where ideas like this matter}
+
+This is a small piece of pure math, not an invention. But the same kind of
+question shows up in real places:
+
+\begin{itemize}[leftmargin=1.4em, itemsep=4pt]
+\item \textbf{Encryption.} Locks on websites, phones and bank apps use
+``scramblers'' built from very simple parts. The SHA-3 standard, for
+example, uses a step shaped like a ring of simple gates, much like the ring
+in my machine. Its ring is a perfect shuffle, so this does \emph{not} mean
+SHA-3 is broken. Designers test scramblers with small checks, and results
+like this one show exactly how big a flaw could still slip past those checks.
+\item \textbf{Random numbers.} Games, lotteries and computer simulations need
+fair random numbers, and generators are tested by checking small groups of
+outputs. Passing those tests doesn't prove perfect fairness. This kind of
+formula says how unfair something could be and still pass.
+\item \textbf{Spot checks in general.} Auditors and quality inspectors check
+samples, not everything. The lesson carries over: small checks can miss a
+flaw, but the flaw can't be tiny. There is a guaranteed minimum size.
+\item \textbf{Computer-checked math.} Every step of the proof was verified by
+\emph{Lean}, software that checks proofs line by line, like a spellchecker
+for logic. It doesn't just seem right; it's been checked.
+\end{itemize}
+
+\section*{In one sentence}
+
+\begin{center}
+\emph{I found the exact formula for how badly a simple scrambling machine has
+to be broken before it can fool small tests, and I built one that's broken by
+exactly that much.}
+\end{center}
+
+\vspace{14pt}
+{\small Full note and computer-checked proofs: \texttt{github.com/<username>/quiet-collisions}\\
+Thanks to Claude (Anthropic), Astra and Gemini Neon for their help.}
+
+\end{document}
