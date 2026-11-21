@@ -13,5 +13,8 @@ for f in FrozenShells FreezeMovies CandyKnots CollisionLaw MaskRecovery Collisio
 done
 echo "== ExactCollisionMinimum"
 LEAN_PATH="$build" lean lean/ExactCollisionMinimum.lean
+echo "== RectangularCollisionMinimum"
+LEAN_PATH="$build" lean lean/RectangularCollisionMinimum.lean
 echo "== Python checks"
 python3 -B checks/quiet_cut_runs.py
+python3 -B checks/rect_exhaustive.py

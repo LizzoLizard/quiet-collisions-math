@@ -37,8 +37,11 @@ $d$-wise uniform, the least possible excess in its ordered collision count is
 A support bound gives the exponent $d+1$, and divisibility of Boolean
 polynomial signed sums gives $\lceil N/k\rceil$. A ring with up to $k-1$
 control bits on each edge attains both constraints simultaneously. We give
-the quadratic case first, then prove the general result. Lean~4 verifies the
-minimum, including the degree of the attaining map.
+the quadratic case first, then prove the general result. For compressing
+maps $Q\colon\F^n\to\F^m$ ($m\le n$) the minimum of $\Coll(Q)-2^{2n-m}$ is
+$2^{\max(2\lceil n/k\rceil-m,\,\lceil n/k\rceil,\,d+1)}$, with a jump when $m$
+drops below $\lceil n/k\rceil$. Lean~4 verifies both minima, including the
+degree of the attaining maps.
 \end{abstract}
 
 \paragraph{A note on this document.}
@@ -56,7 +59,7 @@ uniformity} (every $d$ output coordinates are jointly uniform) and \emph{low
 collision count}. For arbitrary maps, these interact only through a
 coding-theoretic support bound. For maps of algebraic degree two, a second
 constraint appears: Walsh coefficients of quadratic functions are coarsely
-quantised. Theorem~\ref{thm:main} gives the quadratic minimum. Theorem~\ref{thm:all-degrees} extends it to every positive degree bound.
+quantised. Theorem~\ref{thm:main} gives the quadratic minimum. Theorem~\ref{thm:all-degrees} extends it to every positive degree bound, and Theorem~\ref{thm:rect} treats maps with fewer outputs than inputs.
 
 \paragraph{Notation.}
 For $c,y\in\F^N$ write $c\cdot y=\sum_i c_iy_i$ and $\wt(c)$ for the Hamming
@@ -285,6 +288,81 @@ quadratic minimum is $32$. The construction also covers $L=1$ (the
 exceptional slice sends both wire values to zero) and $M=0$ (that slice
 is the whole input cube).
 
+\section{Compressing maps}\label{sec:rect}
+
+Now let $Q\colon\F^n\to\F^m$ with $1\le m\le n$. Define $\W_Q$, $h$ and
+$\Coll(Q)$ as before, with $y$ ranging over $\F^m$. A map whose output is
+uniform has $\Coll(Q)=2^{2n-m}$, and this is the least possible value.
+
+\begin{theorem}\label{thm:rect}
+Let $1\le m\le n$, $k\ge1$ and $0\le d<m$, and put $\ell=\lceil n/k\rceil$.
+Among all maps $Q\colon\F^n\to\F^m$ of coordinate degree at most $k$ that are
+silent through $d$ and have $\Coll(Q)>2^{2n-m}$,
+\[
+  \min_Q\bigl(\Coll(Q)-2^{2n-m}\bigr)=2^{\max(2\ell-m,\;\ell,\;d+1)} .
+\]
+For $m\ge\ell$ the exponent is $\max(\ell,d+1)$. For $m<\ell$ it is $2\ell-m$,
+which then exceeds both $\ell$ and $d+1$.
+\end{theorem}
+
+For $m=n$ this is Theorem~\ref{thm:all-degrees}, since $2\ell-n\le\ell$.
+
+\begin{proof}[Proof of the lower bound]
+Put $f(y)=h(y)-2^{n-m}$. As in Section~2,
+$\sum_yf(y)^2=\Coll(Q)-2^{2n-m}$, $\hat f(0)=0$ and $\hat f(c)=\W_Q(c)$ for
+$c\ne0$. Since $f\ne0$, some $c\ne0$ has $\W_Q(c)\ne0$, and $\W_Q(c)$ is a
+multiple of $2^\ell$ by the divisibility step in the proof of
+Theorem~\ref{thm:all-degrees}. This gives three bounds.
+\begin{itemize}
+\item $2^\ell\le|\hat f(c)|\le\sum_y|f(y)|\le\sum_yf(y)^2$, since $f$ is
+  integer-valued.
+\item Parseval: $2^m\sum_yf(y)^2=\sum_{c'}\hat f(c')^2\ge2^{2\ell}$, so the
+  excess is at least $2^{2\ell-m}$.
+\item Lemma~\ref{lem:support} on $\F^m$ gives
+  $|\operatorname{supp}f|\ge2^{d+1}$, and each nonzero value has $f(y)^2\ge1$.
+\end{itemize}
+If $m<\ell$, then $2\ell-m>\ell>m>d$, which gives the second claim.
+\end{proof}
+
+\begin{proof}[Construction for $m\ge\ell$]
+Let $L=\max(\ell,d+1)\le m$ and take the grouped ring from the proof of
+Theorem~\ref{thm:all-degrees} on $n$ inputs: $L$ wires and $n-L$ controls,
+with output $(t,e)$. Keep $e$ and a set $A$ of $m-L$ controls, and drop the
+other $n-m$ controls, whose set we call $B$. Coordinate degrees do not grow.
+Summing $h(t,e)=1+[t=\one](-1)^{\wt(e)}$ over $t_B$ gives
+\[
+  h'(t_A,e)=2^{n-m}+[t_A=\one]\,(-1)^{\wt(e)} .
+\]
+So the deviation $[t_A=\one](-1)^{\wt(e)}$ has the same shape as before. The
+excess is $2^L$, the only nonzero coefficients are at $b=\one$ with
+magnitude $2^L$, and the map is silent through $L-1\ge d$.
+\end{proof}
+
+\begin{proof}[Construction for $m<\ell$]
+Take the grouped ring with $\ell$ wires and $n-\ell$ controls. This needs
+$n-\ell\le\ell(k-1)$, which holds because $n\le k\ell$. Drop every control
+and fold the surplus wires into the first output:
+\[
+  Q(x)=\pi(e),\qquad
+  \pi(e)=(e_0+e_m+e_{m+1}+\dots+e_{\ell-1},\;e_1,\;\dots,\;e_{m-1}).
+\]
+The map $\pi$ is linear, so degrees do not grow. The histogram of $e$ is
+$g(e)=2^{n-\ell}+(-1)^{\wt(e)}$. For $c\ne0$, the dual vector $\pi^{\top}c$
+is nonzero, so
+\[
+  \W_Q(c)=\sum_e g(e)(-1)^{(\pi^{\top}c)\cdot e}
+         =\sum_e(-1)^{(\pi^{\top}c+\one)\cdot e}
+         =2^\ell\,[\pi^{\top}c=\one].
+\]
+Now $\pi^{\top}c=(c_0,c_1,\dots,c_{m-1},c_0,\dots,c_0)$ equals $\one$ only for
+$c=\one$. The single audible mask has weight $m>d$, and by Parseval the excess
+is $2^{2\ell}/2^m=2^{2\ell-m}$.
+\end{proof}
+
+For instance, take $n=12$ and $k=3$, so $\ell=4$. Every $m$ from $4$ to $12$
+has minimum $2^{\max(4,d+1)}$, as in the square case. Below that the
+minimum jumps: $2^5=32$ for $m=3$, $2^6=64$ for $m=2$ and $2^7=128$ for $m=1$.
+
 \section{Formal verification}
 
 Lean~4.15.0~\cite{Lean4} checks the proofs using its core and standard libraries.
@@ -301,18 +379,28 @@ an attaining witness and a lower bound for every admissible map. Its axiom
 report lists only \texttt{propext}, \texttt{Quot.sound}, and
 \texttt{Classical.choice}.
 
+For Theorem~\ref{thm:rect}, \texttt{RectangularCollisionMinimum.lean} proves
+the three lower bounds, reusing the support bound and signed-sum divisibility.
+It checks both constructions (the ring with dropped controls, and the folded
+ring), including their coordinate degree. The theorem
+\texttt{rect\_exact\_minimum} uses the same axioms.
+
 Independent enumeration checks every bucket, signed coefficient, and coordinate
 degree for $495$ grouped rings through ten bits. Enumeration of all square maps
 through three bits also confirms the minima, using output translations and
-coordinate permutations to reduce the computation.
+coordinate permutations to reduce the computation. Enumeration of every
+eligible compressing map in $30$ cases with $n\le6$ confirms
+Theorem~\ref{thm:rect}, in both regimes.
 
 
 \section{Status of the original questions}
 
-\begin{question}[rectangular maps]
-What is the minimum collision excess for quadratic $Q\colon\F^n\to\F^m$ with
+\begin{question}[rectangular maps, compression answered]
+What is the minimum collision excess for $Q\colon\F^n\to\F^m$ with
 $d$-wise uniform output, when $m<n$ (compression) or $m>n$ (stretch, as in
-low-degree generators~\cite{MST06})? The natural target is $\Coll(Q)-2^{2n-m}$.
+low-degree generators~\cite{MST06})? Theorem~\ref{thm:rect} answers the
+compression case. For a stretch the output cannot be uniform, so the problem
+needs a different baseline, and it remains open.
 \end{question}
 
 \begin{question}[higher degree, answered]
