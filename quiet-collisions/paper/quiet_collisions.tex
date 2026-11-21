@@ -1,0 +1,310 @@
+\documentclass[11pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage[hidelinks]{hyperref}
+
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\theoremstyle{remark}
+\newtheorem{remark}[theorem]{Remark}
+\newtheorem{question}{Question}
+
+\newcommand{\F}{\mathbb{F}_2}
+\newcommand{\wt}{\operatorname{wt}}
+\newcommand{\W}{W}
+\newcommand{\Coll}{\mathrm{C}}
+\newcommand{\one}{\mathbf{1}}
+
+\title{The exact collision cost of low-weight uniformity\\ for quadratic maps over $\F$}
+\author{Ayomide (Daniel) Shittu}
+\date{Draft, November 2026}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+Let $Q\colon\F^N\to\F^N$ be a map whose coordinates have algebraic degree at
+most two, and suppose that the output $Q(U)$ on a uniform input $U$ is $d$-wise
+uniform but $Q$ is not a bijection. We determine exactly the least possible
+number of ordered collisions $\Coll(Q)=\#\{(x,x') : Q(x)=Q(x')\}$:
+\[
+  \min\bigl(\Coll(Q)-2^N\bigr) \;=\; 2^{\max(\lceil N/2\rceil,\; d+1)}
+  \qquad (0\le d<N).
+\]
+The lower bound combines two classical facts, the dual-distance bound for
+functions with vanishing low-weight Fourier coefficients and the divisibility of
+quadratic Walsh coefficients by $2^{\lceil N/2\rceil}$. Our contribution is the
+observation that the larger of the two bounds is always attained, by an explicit
+``ring'' of quadratic gates. The main theorem has been formally verified in
+Lean~4.
+\end{abstract}
+
+\paragraph{A note on this document.}
+This document exists to put the result out there. It is not a polished paper,
+and I apologise for the informality of the write-up. I hope to write a more
+careful version when I have the time. In the meantime, comments, corrections
+and pointers to prior work are very welcome.
+\hfill --- Daniel
+
+\section{Introduction}
+
+A map $Q\colon\F^N\to\F^N$ is a bijection exactly when its output on a uniform
+input is uniform. Two natural weakenings of uniformity are \emph{$d$-wise
+uniformity} (every $d$ output coordinates are jointly uniform) and \emph{low
+collision count}. For arbitrary maps, these interact only through a
+coding-theoretic support bound. For maps of algebraic degree two, a second
+constraint appears: Walsh coefficients of quadratic functions are coarsely
+quantised. This note shows that these two constraints together determine
+the exact minimum collision excess, and that nothing else does.
+
+\paragraph{Notation.}
+For $c,y\in\F^N$ write $c\cdot y=\sum_i c_iy_i$ and $\wt(c)$ for the Hamming
+weight. For $f\colon\F^N\to\mathbb{Z}$ let
+$\hat f(c)=\sum_{y}f(y)(-1)^{c\cdot y}$ (unnormalised). For a map
+$Q\colon\F^N\to\F^N$ let
+\[
+  \W_Q(c)=\sum_{x\in\F^N}(-1)^{c\cdot Q(x)},\qquad
+  h(y)=|Q^{-1}(y)|,\qquad
+  \Coll(Q)=\sum_y h(y)^2 .
+\]
+$Q$ is \emph{quadratic} if every coordinate is a polynomial of degree at most
+two; then every component $c\cdot Q$ is a quadratic Boolean function.
+We say $Q$ is \emph{silent through $d$} if $\W_Q(c)=0$ whenever
+$1\le\wt(c)\le d$. By the XOR lemma this is equivalent to $Q(U)$ being $d$-wise
+uniform.
+
+\begin{definition}
+For $N\ge1$ and $0\le d<N$ let $\mu(N,d)$ be the minimum of $\Coll(Q)-2^N$ over
+quadratic maps $Q\colon\F^N\to\F^N$ that are silent through $d$ and are not
+bijections.
+\end{definition}
+
+The restriction $d<N$ is necessary: silence through $N$ means $Q(U)$ is uniform,
+so $Q$ is a bijection. Note $\Coll(Q)\ge 2^N$ with equality iff $Q$ is a
+bijection, so $\Coll(Q)-2^N$ measures distance from bijectivity. Equivalently,
+the collision probability of $Q(U)$ is $2^{-N}+(\Coll(Q)-2^N)\,2^{-2N}$.
+
+\begin{theorem}\label{thm:main}
+For all $N\ge 1$ and $0\le d<N$,
+\[
+  \mu(N,d)=2^{\max(\lceil N/2\rceil,\;d+1)} .
+\]
+\end{theorem}
+
+\paragraph{Status.}
+Both halves of the lower bound are classical (Lemmas~\ref{lem:support}
+and~\ref{lem:divisibility}); we include short self-contained proofs. We were not
+able to find the exact value $\mu(N,d)$, or the matching construction, in the
+literature, and would be grateful for pointers.
+
+\section{The deviation function}
+
+Let $f(y)=h(y)-1$. Since $\sum_y h(y)=2^N$,
+\begin{equation}\label{eq:excess}
+  \sum_y f(y)=0, \qquad
+  \sum_y f(y)^2=\Coll(Q)-2\cdot 2^N+2^N=\Coll(Q)-2^N .
+\end{equation}
+For $c\ne0$ we have $\sum_y(-1)^{c\cdot y}=0$, so
+\begin{equation}\label{eq:walsh}
+  \W_Q(c)=\sum_y h(y)(-1)^{c\cdot y}=\hat f(c)\quad(c\neq 0),\qquad \hat f(0)=0 .
+\end{equation}
+Thus $Q$ is a bijection iff $f\equiv 0$, and $Q$ is silent through $d$ iff
+$\hat f(c)=0$ for every $c$ with $\wt(c)\le d$ (including $c=0$).
+
+\section{Lower bounds}
+
+\begin{lemma}[support bound]\label{lem:support}
+Let $f\colon\F^n\to\mathbb{Z}$ be nonzero with $\hat f(c)=0$ for all
+$\wt(c)<k$. Then $|\operatorname{supp} f|\ge 2^k$.
+\end{lemma}
+
+This is the well-known statement that the dual of the degree-$(n-k)$ Reed--Muller
+space has minimum distance $2^k$; equivalently, it is the minimum support of a
+$(k-1)$-wise uniform signed measure~\cite{Delsarte73,MacWilliamsSloane,ODonnell}. For
+completeness, here is a direct proof.
+
+\begin{proof}
+Induction on $n$. If $n=0$, then $f$ is a nonzero constant and $\hat f(0)=f\ne0$,
+so $k=0$ and the claim holds. For $n\ge1$ and $k=0$ the claim is trivial. Let
+$n,k\ge1$ and split on the last coordinate: $f_b(y')=f(y',b)$. Put
+$s=f_0+f_1$ and $t=f_0-f_1$ on $\F^{n-1}$. Then
+$\hat s(c')=\hat f(c',0)$ vanishes for $\wt(c')<k$, and
+$\hat t(c')=\hat f(c',1)$ vanishes for $\wt(c')<k-1$.
+If $s\neq0$, induction gives
+$|\operatorname{supp} f|\ge|\operatorname{supp} s|\ge 2^k$.
+If $s=0$, then $f_1=-f_0$ with $f_0\ne0$ and $t=2f_0$, so induction gives
+$|\operatorname{supp} f|=2|\operatorname{supp} f_0|\ge 2\cdot2^{k-1}$.
+\end{proof}
+
+\begin{lemma}[quadratic divisibility]\label{lem:divisibility}
+If $g\colon\F^n\to\F$ has degree at most two, then
+$2^{\lceil n/2\rceil}$ divides $\sum_x(-1)^{g(x)}$.
+\end{lemma}
+
+This follows from Dickson's theorem: the Walsh values of $g$ lie in
+$\{0,\pm2^{n-r/2}\}$ where $r$ is the (even) rank of its polar form
+\cite[Ch.~15]{MacWilliamsSloane}, \cite{Carlet21}. Since $r\le 2\lfloor
+n/2\rfloor$, the exponent is at least $\lceil n/2\rceil$. An elementary proof:
+
+\begin{proof}
+Induction on $n$; write $S(g)=\sum_x(-1)^{g(x)}$. If $g$ is affine then
+$S(g)\in\{0,\pm2^n\}$. Otherwise some product $x_ix_j$ occurs; rename it $x_1x_2$
+and write $g=x_1x_2+x_1A+x_2B+C$ with $A,B$ affine and $C$ quadratic in
+$x_3,\dots,x_n$. Summing over $x_1$ gives $2[x_2=A]$, and then over $x_2$ gives
+$2(-1)^{AB}$, so $S(g)=2\,S(C+AB)$, where $C+AB$ is quadratic in $n-2$ variables.
+By induction $2^{1+\lceil (n-2)/2\rceil}=2^{\lceil n/2\rceil}$ divides $S(g)$.
+\end{proof}
+
+\begin{proof}[Proof of the lower bound in Theorem~\ref{thm:main}]
+Let $Q$ be quadratic, silent through $d$, and not a bijection, and let $f$ be
+its deviation. Then $f\ne0$.
+
+\emph{Sparsity.} By~\eqref{eq:walsh}, $\hat f$ vanishes on all $c$ with
+$\wt(c)<d+1$. Lemma~\ref{lem:support} gives
+$|\operatorname{supp} f|\ge2^{d+1}$. Each nonzero integer $f(y)$ contributes at
+least $1$ to~\eqref{eq:excess}, so $\Coll(Q)-2^N\ge 2^{d+1}$.
+
+\emph{Quantisation.} Since $f\ne0$, Fourier inversion gives some $c$ with $\hat
+f(c)\ne0$, and $c\ne0$ because $\hat f(0)=0$. By~\eqref{eq:walsh} and
+Lemma~\ref{lem:divisibility} applied to $c\cdot Q$,
+$|\hat f(c)|=|\W_Q(c)|\ge 2^{\lceil N/2\rceil}$. Since $f$ is integer-valued,
+\[
+  2^{\lceil N/2\rceil}\le|\hat f(c)|\le\sum_y|f(y)|\le\sum_y f(y)^2=\Coll(Q)-2^N.
+  \qedhere
+\]
+\end{proof}
+
+\begin{remark}
+The sparsity bound uses nothing about degree, and the quantisation bound uses
+nothing about silence. For arbitrary (non-quadratic) maps the sparsity bound
+$2^{d+1}$ is already tight. For instance, the support-$2^{d+1}$ extremiser of
+Lemma~\ref{lem:support} is realised by moving $2^d$ preimages. When $d=0$, a
+quadratic non-bijection on $N\ge3$ bits cannot have a single double bucket and
+a single empty bucket: such a map has excess $2<2^{\lceil N/2\rceil}$.
+\end{remark}
+
+\section{A matching construction}
+
+Let $m=\max(\lceil N/2\rceil,d+1)$ and $s=N-m$. Then $1\le m\le N$ (as $d<N$)
+and $s\le m$ (as $m\ge N/2$). Write inputs as $(t,w)$ with \emph{controls}
+$t\in\F^s$ and \emph{wires} $w\in\F^m$ indexed by $\mathbb{Z}/m$. Put
+$\tau_i=t_i$ for $i<s$ and $\tau_i=1$ for $s\le i<m$, and define
+\[
+  R(t,w)=(t,e),\qquad e_i=w_{i+1}+\tau_i\,w_i\quad(i\in\mathbb{Z}/m).
+\]
+Every coordinate has degree at most two.
+
+\begin{lemma}\label{lem:ring}
+For $t\ne\one$, the map $w\mapsto e$ is a bijection of $\F^m$. For $t=\one$
+(that is, $\tau=\one$), every even-weight $e$ has exactly two preimages and every
+odd-weight $e$ has none.
+\end{lemma}
+
+\begin{proof}
+For fixed $t$ the map $w\mapsto e$ is linear. If $\tau_i=0$ for some $i$, then
+$w_{i+1}=e_i$, and $w_{j+1}=e_j+\tau_jw_j$ determines every remaining wire in
+turn around the ring. Hence the map is injective, and therefore bijective. If
+$\tau=\one$, then $e_i=w_i+w_{i+1}$. The kernel is $\{0,\one\}$, and the image
+lies in the even-weight words. By counting dimensions, the image is exactly the
+even-weight words. (For $m=1$ this reads $e_0=0$.)
+\end{proof}
+
+\begin{proof}[Proof of the upper bound in Theorem~\ref{thm:main}]
+By Lemma~\ref{lem:ring}, the deviation of $R$ is
+\[ f(t,e)=[t=\one]\,(-1)^{\wt(e)} . \]
+It is nonzero on exactly $2^m$ outputs, all
+with $|f|=1$, so $\Coll(R)-2^N=2^m$ by~\eqref{eq:excess}. Its transform is
+\[
+  \hat f(a,b)=(-1)^{\wt(a)}\sum_{e\in\F^m}(-1)^{(b+\one)\cdot e}
+  =(-1)^{\wt(a)}\,2^m\,[\,b=\one\,].
+\]
+Hence $\W_R(a,b)=0$ unless $b=\one$, and every audible mask has weight at least
+$m\ge d+1$. So $R$ is silent through $d$, is not a bijection, and attains
+$2^{\max(\lceil N/2\rceil,d+1)}$.
+\end{proof}
+
+\begin{remark}
+The extremiser has $2^{m-1}$ double buckets and $2^{m-1}$ empty buckets, all inside one
+control slice. Its first audible mask is the all-wires mask, with coefficient
+exactly $2^m$, so every inequality in the quantisation chain
+$|\hat f(c)|\le\sum|f|\le\sum f^2$ is an equality; when $d+1\ge\lceil N/2\rceil$
+the support bound is tight as well. For example,
+$N=10$ and $d=4$ give $m=5$: $16$ double and $16$ empty buckets, every mask of
+weight at most $4$ silent, and $\W_R(0,\one)=32$.
+\end{remark}
+
+\section{Formal verification}
+\begin{sloppypar}
+
+Theorem~\ref{thm:main} and Lemmas~\ref{lem:support}, \ref{lem:divisibility}
+and~\ref{lem:ring} are machine-checked in Lean~4.15.0~\cite{Lean4}, using only
+the core library (no Mathlib). The files are \texttt{SilentRoom.lean}
+(\texttt{quiet\_support}, \texttt{quadratic\_excess},
+\texttt{minimum\_excess\_bound}) and \texttt{RingCracks.lean}
+(\texttt{ring\_histogram}, \texttt{reduced\_spectrum}, \texttt{optimal\_ring}).
+Every theorem depends only on the standard axioms \texttt{propext},
+\texttt{Quot.sound} and \texttt{Classical.choice}. An independent Python script
+checks every bucket and every mask of the construction for all $78$ parameter
+pairs $(N,d)$ with $N\le 12$.
+\end{sloppypar}
+
+\section{Questions}
+
+\begin{question}[rectangular maps]
+What is the minimum collision excess for quadratic $Q\colon\F^n\to\F^m$ with
+$d$-wise uniform output, when $m<n$ (compression) or $m>n$ (stretch, as in
+low-degree generators~\cite{MST06})? The natural target is $\Coll(Q)-2^{2n-m}$.
+\end{question}
+
+\begin{question}[higher degree]
+By McEliece's theorem~\cite{McEliece72}, the Walsh coefficients of a degree-$k$ function on $n$
+variables are divisible by $2^{\lceil n/k\rceil}$. The same argument therefore
+gives $\Coll(Q)-2^N\ge 2^{\max(\lceil N/k\rceil,d+1)}$ for degree-$k$ maps. Is
+this tight?
+\end{question}
+
+\begin{question}[extremisers and robustness]
+Is every extremal map affinely equivalent to the ring $R$? Does a robust version
+hold, where low-weight coefficients are small rather than zero?
+\end{question}
+
+\section*{Acknowledgements}
+I thank Claude (an AI model by Anthropic), which helped with the proofs, the
+Lean formalization and the write-up, and Astra and Gemini Neon for their help.
+
+{\small
+\begin{thebibliography}{9}
+\bibitem{Carlet21}
+C.~Carlet, \emph{Boolean Functions for Cryptography and Coding Theory},
+Cambridge University Press, 2021.
+
+\bibitem{Delsarte73}
+P.~Delsarte, An algebraic approach to the association schemes of coding theory,
+\emph{Philips Research Reports Supplements} 10, 1973.
+
+\bibitem{MacWilliamsSloane}
+F.~J.~MacWilliams and N.~J.~A.~Sloane, \emph{The Theory of Error-Correcting
+Codes}, North-Holland, 1977.
+
+\bibitem{McEliece72}
+R.~J.~McEliece, Weight congruences for $p$-ary cyclic codes,
+\emph{Discrete Mathematics} 3, 1972.
+
+\bibitem{MST06}
+E.~Mossel, A.~Shpilka and L.~Trevisan, On $\epsilon$-biased generators in
+$\mathrm{NC}^0$, \emph{Random Structures \& Algorithms} 29(1), 2006.
+
+\bibitem{Lean4}
+L.~de~Moura and S.~Ullrich, The Lean 4 theorem prover and programming language,
+\emph{CADE-28}, 2021.
+
+\bibitem{ODonnell}
+R.~O'Donnell, \emph{Analysis of Boolean Functions}, Cambridge University Press,
+2014.
+\end{thebibliography}
+}
+
+\end{document}
