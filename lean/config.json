@@ -1,0 +1,9 @@
+{
+    "challenge_module": "Challenge",
+    "solution_module": "Solution",
+    "theorem_names": [
+        "QuietCollisionsChallenge.exact_minimum",
+        "QuietCollisionsChallenge.rect_exact_minimum"
+    ],
+    "permitted_axioms": ["propext", "Quot.sound", "Classical.choice"]
+}

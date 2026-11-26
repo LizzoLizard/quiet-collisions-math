@@ -1,0 +1,105 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/mathlib-initiative/formalization.yaml/main/schema/formalization.schema.json
+version: "v0.4"
+
+project:
+  name: "quiet-collisions-math"
+  description: >-
+    Lean 4 proof of the exact minimum ordered-collision excess of a non-bijective map
+    Q: F_2^n -> F_2^n of algebraic degree at most k whose output is d-wise uniform:
+    min (C(Q) - 2^n) = 2^max(ceil(n/k), d+1). Also the compressing case Q: F_2^n -> F_2^m,
+    m <= n: min (C(Q) - 2^(2n-m)) = 2^max(2 ceil(n/k) - m, ceil(n/k), d+1). Both the lower
+    bounds and the attaining constructions (including their degree) are formalized.
+  authors: ["Daniel Ayomide Shittu"]
+  responsible_maintainers: ["Daniel Ayomide Shittu"]
+  license: "MIT"
+
+sources:
+  - title: "The exact collision cost of low-weight uniformity for polynomial maps over GF(2)"
+    authors: ["Daniel Ayomide Shittu"]
+    id: "https://doi.org/10.5281/zenodo.24427416"
+    type: "original-proof"
+    location: "paper/quiet_collisions.tex"
+    relationship: "formalizes"
+    note: "New result, first presented here. The Lean proof covers the all-degrees theorem and the compressing-maps theorem."
+    author_endorsement: "participated"
+  - title: "Weight congruences for p-ary cyclic codes"
+    authors: ["R. J. McEliece"]
+    id: "Discrete Mathematics 3 (1972)"
+    type: "article"
+    relationship: "background"
+    note: "Classical divisibility behind the 2^ceil(n/k) lower bound; reproved in Lean (DegreeDivisibility.lean)."
+    author_endorsement: "n/a"
+  - title: "An algebraic approach to the association schemes of coding theory"
+    authors: ["P. Delsarte"]
+    id: "Philips Research Reports Supplements 10 (1973)"
+    type: "article"
+    relationship: "background"
+    note: "Classical support (dual distance) bound behind the 2^(d+1) lower bound; reproved in Lean (SilentRoom.lean)."
+    author_endorsement: "n/a"
+
+classification:
+  arxiv: ["cs.IT", "math.CO", "cs.CC"]
+  msc2020: ["94D10", "94B05", "68R05"]
+
+status:
+  scope: >-
+    Both exact minima are proved in Lean with no hypotheses: lower bounds for every eligible map
+    and explicit attaining maps with verified degree, d-wise uniformity and collision count.
+    Not formalized: the stretching case m > n, which the paper leaves open.
+  sorry_count: 0
+  sorry_in_definitions: 0
+  axioms: ["propext", "Quot.sound", "Classical.choice"]
+  main_results:
+    - declaration: "QuietCollisionsChallenge.exact_minimum"
+      file: "lean/Solution.lean"
+      sorry_count: 0
+      axioms: ["propext", "Quot.sound", "Classical.choice"]
+      comparator_config: "lean/config.json"
+    - declaration: "QuietCollisionsChallenge.rect_exact_minimum"
+      file: "lean/Solution.lean"
+      sorry_count: 0
+      axioms: ["propext", "Quot.sound", "Classical.choice"]
+      comparator_config: "lean/config.json"
+
+automation:
+  methods:
+    - method: "agent"
+      models: ["Claude (Anthropic)", "Astra (OpenAI)", "Gemini Neon (Google)"]
+      framework: "Claude Code, Codex, Antigravity"
+      tool_setup: "Interactive sessions directed by the author; Lean 4.15.0 with no Mathlib."
+  notes: >-
+    Claude helped with the proofs, the Lean formalization and the write-up; Astra and Gemini Neon
+    also helped, in interactive sessions with the author.
+
+fidelity:
+  divergences: >-
+    None for the two main theorems. Definitions are elementary (bit-vectors as nested pairs,
+    unnormalized Walsh sums, algebraic normal forms as lists of monomials) rather than Mathlib's,
+    and are stated in lean/ChallengeDefs.lean. Collision counts are ordered and include the diagonal.
+
+review:
+  status: "self-assessed"
+  reviewers: []
+  notes: "No independent peer review recorded here."
+
+alignment:
+  namespace: "QuietCollisionsChallenge"
+  statements:
+    - source: "Quadratic minimum (paper, label thm:main)"
+      lean: "exact_minimum"
+      module: "Solution"
+      status: "proved"
+      note: "The quadratic case is k = 2 of exact_minimum; SilentRoom/RingCracks also prove it directly."
+    - source: "Every degree k (paper, label thm:all-degrees)"
+      lean: "exact_minimum"
+      module: "Solution"
+      status: "proved"
+    - source: "Compressing maps (paper, label thm:rect)"
+      lean: "rect_exact_minimum"
+      module: "Solution"
+      status: "proved"
+    - source: "Question 1, stretching maps (m > n)"
+      lean: ""
+      module: ""
+      status: "not-formalized"
+      note: "Open."

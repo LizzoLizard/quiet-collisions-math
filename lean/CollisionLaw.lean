@@ -4,13 +4,7 @@ import FreezeMovies
 namespace CollisionLaw
 open FrozenShells CandyKnots FreezeMovies
 
-def many (n : Nat) := (2:Int)^n
-def chr (c s : W r) := sign (dot r c s)
-def hits (s t : W r) : Int := if s = t then 1 else 0
-
-def walsh (Q : W n → W r) (c : W r) := total n (fun x => chr c (Q x))
 def solutions (Q : W n → W r) := total n (fun x => hits (Q x) (zero r))
-def collisions (Q : W n → W r) := total n (fun x => total n (fun y => hits (Q x) (Q y)))
 
 theorem total_const (n : Nat) (k : Int) : total n (fun _ => k) = many n * k := by
   induction n with

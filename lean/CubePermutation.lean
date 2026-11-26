@@ -3,10 +3,6 @@ import SilentRoom
 namespace CubePermutation
 open FrozenShells CandyKnots CollisionLaw MaskRecovery SilentRoom
 
-/-- Each output has exactly one preimage. -/
-def IsPermutation (Q : W n → W n) : Prop :=
-  ∀ y, ∃ x, Q x = y ∧ ∀ z, Q z = y → z = x
-
 private theorem term_le_total (f : W n → Int) (nn : ∀ z, 0 ≤ f z) (x : W n) :
     f x ≤ total n f := by
   rw [← select n x f]

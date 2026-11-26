@@ -19,11 +19,6 @@ theorem pack_tail {w : W (n+1)} {b : Bool} (hb : parity (n+1) w = b) : pack b w.
   simp only [pack, parity] at *
   cases a <;> cases e : parity n w <;> simp_all
 
-instance wordEq (n : Nat) : DecidableEq (W n) := by
-  induction n with
-  | zero => exact inferInstanceAs (DecidableEq Unit)
-  | succ n ih => exact inferInstanceAs (DecidableEq (Bool × W n))
-
 def worlds : (n : Nat) → List (W n)
   | 0 => [()]
   | n+1 => (worlds n).map (fun w => (false,w)) ++ (worlds n).map (fun w => (true,w))

@@ -1,0 +1,44 @@
+cff-version: 1.2.0
+message: "If you use this work, please cite it using the following metadata."
+title: "The exact collision cost of low-weight uniformity for polynomial maps over GF(2)"
+authors:
+  - family-names: "Shittu"
+    given-names: "Daniel Ayomide"
+    affiliation: "Rowan University"
+type: software
+version: "v2.0.0"
+date-released: 2026-11-26
+doi: "10.5281/zenodo.24427416"
+license: MIT
+repository-code: "https://github.com/LizzoLizard/quiet-collisions-math"
+url: "https://lizzolizard.github.io/quiet-collisions-math/"
+abstract: >-
+  Exact minimum ordered-collision excess of a non-bijective, degree-k map over GF(2) whose
+  output is d-wise uniform: 2^max(ceil(n/k), d+1); and 2^max(2 ceil(n/k) - m, ceil(n/k), d+1)
+  for compressing maps F_2^n -> F_2^m. Paper and complete Lean 4 proof.
+keywords:
+  - Boolean functions
+  - Polynomial maps over GF(2)
+  - k-wise independence
+  - Collision probability
+  - Walsh-Hadamard transform
+  - Reed-Muller codes
+  - Lean 4
+  - Formal verification
+identifiers:
+  - type: doi
+    value: "10.5281/zenodo.24427416"
+    description: "Concept DOI (all versions)"
+  - type: doi
+    value: "10.5281/zenodo.24546569"
+    description: "This version (v2.0.0)"
+preferred-citation:
+  type: article
+  title: "The exact collision cost of low-weight uniformity for polynomial maps over GF(2)"
+  authors:
+    - family-names: "Shittu"
+      given-names: "Daniel Ayomide"
+      affiliation: "Rowan University"
+  year: 2026
+  doi: "10.5281/zenodo.24427416"
+  notes: "Preprint"

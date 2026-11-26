@@ -19,8 +19,8 @@
 \newcommand{\one}{\mathbf{1}}
 
 \title{The exact collision cost of low-weight uniformity\\ for polynomial maps over $\F$}
-\author{Ayomide (Daniel) Shittu}
-\date{Draft, November 2026}
+\author{Daniel Ayomide Shittu\\ {\small Rowan University}}
+\date{Preprint, version 2, November 2026}
 
 \begin{document}
 \maketitle
@@ -44,12 +44,14 @@ drops below $\lceil n/k\rceil$. Lean~4 verifies both minima, including the
 degree of the attaining maps.
 \end{abstract}
 
-\paragraph{A note on this document.}
-This document exists to put the result out there. It is not a polished paper,
-and I apologise for the informality of the write-up. I hope to write a more
-careful version when I have the time. In the meantime, comments, corrections
-and pointers to prior work are very welcome.
-\hfill --- Daniel
+\paragraph{Relation to prior work.}
+Both lower bounds are classical: the support bound for functions whose
+low-weight Fourier coefficients vanish~\cite{Delsarte73,MacWilliamsSloane}, and
+McEliece-type divisibility of signed sums of degree-$k$
+polynomials~\cite{McEliece72}. The contribution of this note is that the larger
+of the two is always attained, by an explicit ring of gates, and the analogous
+exact answer for compressing maps. We have not found these exact statements in
+the literature; pointers are welcome.
 
 \section{Introduction}
 
@@ -365,7 +367,12 @@ minimum jumps: $2^5=32$ for $m=3$, $2^6=64$ for $m=2$ and $2^7=128$ for $m=1$.
 
 \section{Formal verification}
 
-Lean~4.15.0~\cite{Lean4} checks the proofs using its core and standard libraries.
+Lean~4.15.0~\cite{Lean4} checks the proofs using its core and standard libraries
+(no Mathlib). The definitions used in the two main statements are collected in
+\texttt{ChallengeDefs.lean}, and \texttt{Challenge.lean} states
+Theorems~\ref{thm:all-degrees} and~\ref{thm:rect} over them. A comparator check
+confirms that \texttt{Solution.lean} proves exactly these statements over the
+same definitions, so a reader only has to check those two short files.
 For the quadratic case, \texttt{SilentRoom.lean} proves both lower bounds and
 \texttt{RingCracks.lean} gives the ring histogram and spectrum.
 
@@ -384,6 +391,10 @@ the three lower bounds, reusing the support bound and signed-sum divisibility.
 It checks both constructions (the ring with dropped controls, and the folded
 ring), including their coordinate degree. The theorem
 \texttt{rect\_exact\_minimum} uses the same axioms.
+
+The Lean files, the checking scripts and a script \texttt{verify.sh} that runs every
+check are archived at \url{https://doi.org/10.5281/zenodo.24427416} and available at
+\url{https://github.com/LizzoLizard/quiet-collisions-math}.
 
 Independent enumeration checks every bucket, signed coefficient, and coordinate
 degree for $495$ grouped rings through ten bits. Enumeration of all square maps

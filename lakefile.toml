@@ -1,0 +1,13 @@
+name = "quiet_collisions"
+version = "0.2.0"
+srcDir = "lean"
+defaultTargets = ["ChallengeDefs", "Challenge", "Solution", "ExactCollisionMinimum", "RectangularCollisionMinimum"]
+description = "Exact minimum collision excess of d-wise uniform, degree-k polynomial maps over GF(2), formalized in Lean 4."
+keywords = ["math", "boolean-functions", "coding-theory", "pseudorandomness", "formal-verification"]
+license = "MIT"
+
+[[lean_lib]]
+name = "QuietCollisions"
+roots = ["ChallengeDefs", "Challenge", "FrozenShells", "FreezeMovies", "CandyKnots", "CollisionLaw",
+  "MaskRecovery", "CollisionCircuit", "SilentRoom", "RingCracks", "DegreeDivisibility",
+  "CubePermutation", "GroupedRing", "ExactCollisionMinimum", "RectangularCollisionMinimum", "Solution"]

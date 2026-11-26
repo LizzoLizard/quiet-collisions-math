@@ -6,15 +6,6 @@ for every attainable integer. Collision counts are ordered and include the diago
 namespace ExactCollisionMinimum
 open FrozenShells CollisionLaw MaskRecovery SilentRoom DegreeDivisibility CubePermutation
 
-/-- Low-weight silence concerns nonconstant output characters only. -/
-def SilentThrough (d : Nat) (Q : W n → W n) : Prop :=
-  ∀ c, c ≠ zero n → weight n c ≤ d → walsh Q c = 0
-
-/-- A possible value of C(Q) − 2^n for a degree-bounded silent non-permutation. -/
-def Attainable (n k d : Nat) (value : Int) : Prop :=
-  ∃ Q : W n → W n, MapDegree k n Q ∧ SilentThrough d Q ∧
-    ¬ IsPermutation Q ∧ collisions Q - many n = value
-
 theorem lower_bound (hk : 0 < k) (possible : Attainable n k d value) :
     many (max ((n+k-1)/k) (d+1)) ≤ value := by
   obtain ⟨Q,degree,quiet,nonperm,rfl⟩ := possible

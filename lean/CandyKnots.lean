@@ -136,11 +136,6 @@ theorem pick_some (f : Form (n+1)) (i : Pos n) (h : pick f.bits = some i) :
         subst i
         exact ih (trim f) j p
 
-/-- The reference sum is for the specification only. -/
-def total : (n : Nat) → (W n → Int) → Int
-  | 0, f => f ()
-  | n+1, f => total n (fun w => f (false,w)) + total n (fun w => f (true,w))
-
 theorem total_add (n : Nat) (f g : W n → Int) :
     total n (fun w => f w + g w) = total n f + total n g := by
   induction n with
@@ -165,8 +160,6 @@ theorem pivot_sum (i : Pos n) (f : W (n+1) → Int) :
     change total (n+1) (fun w => f (false,w)) + total (n+1) (fun w => f (true,w)) = _
     rw [ih (fun w => f (false,w)), ih (fun w => f (true,w))]
     rfl
-
-def sign (b : Bool) : Int := if b then -1 else 1
 
 /-- Sum out x,y in xy + x*A + y*B + C. No restriction on A,B,C here. -/
 theorem pair_identity (a b c : Bool) :

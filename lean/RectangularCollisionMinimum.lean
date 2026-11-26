@@ -31,16 +31,6 @@ def rectDev (n m : Nat) (Q : W n → W m) (y : W m) : Int :=
 def rectOffZero (Q : W n → W m) (c : W m) : Int :=
   if c = zero m then 0 else walsh Q c
 
-def RectSilentThrough (d : Nat) (Q : W n → W m) : Prop :=
-  ∀ c, c ≠ zero m → weight m c ≤ d → walsh Q c = 0
-
-def rectExp (n m k d : Nat) : Nat :=
-  max (max (2 * ((n + k - 1) / k) - m) ((n + k - 1) / k)) (d + 1)
-
-def RectAttainable (n m k d : Nat) (value : Int) : Prop :=
-  ∃ Q : W n → W m, MapDegree k m Q ∧ RectSilentThrough d Q ∧
-    many (2 * n - m) < collisions Q ∧ collisions Q - many (2 * n - m) = value
-
 theorem rect_walsh_zero (Q : W n → W m) : walsh Q (zero m) = many n := by
   simp [walsh, chr, dot_zero, sign, total_const]
 

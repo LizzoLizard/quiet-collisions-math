@@ -3,10 +3,6 @@ import CollisionCircuit
 namespace SilentRoom
 open FrozenShells CandyKnots FreezeMovies CollisionLaw MaskRecovery
 
-def weight : (n : Nat) → W n → Nat
-  | 0, _ => 0
-  | n+1, c => weight n c.2 + (if c.1 then 1 else 0)
-
 def transform (f : W n → Int) (c : W n) := total n (fun y => f y * chr c y)
 def histogram (Q : W n → W m) (y : W m) := total n (fun x => hits (Q x) y)
 def changed (f : W n → Int) := total n (fun x => if f x = 0 then 0 else 1)

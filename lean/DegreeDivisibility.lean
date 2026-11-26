@@ -5,17 +5,6 @@ polynomial. A mask specifies a squarefree monomial in the input coordinates. -/
 namespace DegreeDivisibility
 open FrozenShells CandyKnots CollisionLaw SilentRoom
 
-def monomial : (n : Nat) → W n → W n → Bool
-  | 0, _, _ => true
-  | n+1, p, x => (!p.1 || x.1) && monomial n p.2 x.2
-
-def evalANF {n : Nat} : List (W n) → W n → Bool
-  | [], _ => false
-  | p :: ps, x => xor (monomial n p x) (evalANF ps x)
-
-def DegreeLE {n : Nat} (k : Nat) (f : W n → Bool) : Prop :=
-  ∃ ps : List (W n), (∀ p ∈ ps, weight n p ≤ k) ∧ ∀ x, f x = evalANF ps x
-
 theorem degree_mono {f : W n → Bool} (hf : DegreeLE a f) (h : a ≤ b) : DegreeLE b f := by
   obtain ⟨ps, hp, he⟩ := hf
   exact ⟨ps, fun p hmem => Nat.le_trans (hp p hmem) h, he⟩
@@ -194,11 +183,6 @@ theorem mceliece_divisibility {n k : Nat} (hk : 0 < k) {f : W n → Bool} (hf : 
   simpa only [partialSum, monomial_zero, show ind true = 1 from rfl, Int.one_mul,
     show many 0 = 1 from rfl, e] using h
 
-
-/-- Every output bit has an algebraic normal form of degree at most k. -/
-def MapDegree {n : Nat} (k : Nat) : (m : Nat) → (W n → W m) → Prop
-  | 0, _ => True
-  | m+1, Q => DegreeLE k (fun x => (Q x).1) ∧ MapDegree k m (fun x => (Q x).2)
 
 theorem mapDegree_mono (m : Nat) (Q : W n → W m) (hf : MapDegree a m Q) (h : a ≤ b) :
     MapDegree b m Q := by

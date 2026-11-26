@@ -1,22 +1,11 @@
+import ChallengeDefs
 import Std
 
 namespace FrozenShells
 
-def W : Nat → Type
-  | 0 => Unit
-  | n+1 => Bool × W n
-
-def zero : (n : Nat) → W n
-  | 0 => ()
-  | n+1 => (false, zero n)
-
 def add : (n : Nat) → W n → W n → W n
   | 0, _, _ => ()
   | n+1, u, v => (xor u.1 v.1, add n u.2 v.2)
-
-def dot : (n : Nat) → W n → W n → Bool
-  | 0, _, _ => false
-  | n+1, u, v => xor (u.1 && v.1) (dot n u.2 v.2)
 
 theorem dot_add (n : Nat) (a b w : W n) :
     dot n (add n a b) w = xor (dot n a w) (dot n b w) := by

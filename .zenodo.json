@@ -1,0 +1,31 @@
+{
+  "title": "The exact collision cost of low-weight uniformity for polynomial maps over GF(2)",
+  "upload_type": "publication",
+  "publication_type": "preprint",
+  "description": "<p>Let Q: F<sub>2</sub><sup>n</sup> → F<sub>2</sub><sup>n</sup> have coordinates of algebraic degree at most k, and suppose its output on a uniform input is d-wise uniform but Q is not a bijection. The smallest possible ordered-collision excess C(Q) − 2<sup>n</sup> is exactly 2<sup>max(⌈n/k⌉, d+1)</sup>, for every k ≥ 1 and 0 ≤ d &lt; n. For compressing maps F<sub>2</sub><sup>n</sup> → F<sub>2</sub><sup>m</sup> (m ≤ n) the minimum of C(Q) − 2<sup>2n−m</sup> is 2<sup>max(2⌈n/k⌉ − m, ⌈n/k⌉, d+1)</sup>.</p><p>Both lower bounds are classical (Delsarte's support bound and McEliece-type divisibility); the contribution is that the larger one is always attained, by an explicit ring of gates, and the exact answer for compressing maps.</p><p>Contents: the paper, a plain-language explainer, and a complete Lean 4 proof (no Mathlib, no sorry, standard axioms only) with a comparator-checked Challenge/Solution pair, plus independent Python checks. Run ./verify.sh to check everything.</p><p>New in version 2: Challenge/Solution comparator check, formalization.yaml, CI, citation metadata; the mathematics is unchanged. The paper is licensed CC BY 4.0; the code is MIT.</p>",
+  "creators": [
+    {
+      "name": "Shittu, Daniel Ayomide",
+      "affiliation": "Rowan University"
+    }
+  ],
+  "license": "cc-by-4.0",
+  "version": "v2.0.0",
+  "keywords": [
+    "Boolean functions",
+    "polynomial maps over GF(2)",
+    "k-wise independence",
+    "collision probability",
+    "Walsh-Hadamard transform",
+    "Reed-Muller codes",
+    "Lean 4",
+    "formal verification"
+  ],
+  "related_identifiers": [
+    {
+      "identifier": "https://github.com/LizzoLizard/quiet-collisions-math",
+      "relation": "isSupplementedBy",
+      "scheme": "url"
+    }
+  ]
+}

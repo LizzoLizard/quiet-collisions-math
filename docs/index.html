@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Quiet Collisions | Exact collision cost over GF(2)</title>
+<meta name="description" content="The exact minimum number of collisions of a non-bijective, degree-k polynomial map over GF(2) whose output is d-wise uniform: 2^max(⌈n/k⌉, d+1) above a bijection. Paper and complete Lean 4 proof by Daniel Ayomide Shittu.">
+<link rel="canonical" href="https://lizzolizard.github.io/quiet-collisions-math/">
+<meta property="og:type" content="article">
+<meta property="og:title" content="The exact collision cost of low-weight uniformity for polynomial maps over GF(2)">
+<meta property="og:description" content="min (C(Q) − 2^n) = 2^max(⌈n/k⌉, d+1) for degree-k, d-wise uniform non-bijections over GF(2), plus the exact answer for compressing maps. Fully checked in Lean 4.">
+<meta property="og:url" content="https://lizzolizard.github.io/quiet-collisions-math/">
+<meta name="twitter:card" content="summary">
+<meta name="citation_title" content="The exact collision cost of low-weight uniformity for polynomial maps over GF(2)">
+<meta name="citation_author" content="Shittu, Daniel Ayomide">
+<meta name="citation_author_institution" content="Rowan University">
+<meta name="citation_publication_date" content="2026/11/22">
+<meta name="citation_doi" content="10.5281/zenodo.24427416">
+<meta name="citation_pdf_url" content="https://lizzolizard.github.io/quiet-collisions-math/paper.pdf">
+<meta name="citation_keywords" content="Boolean functions; polynomial maps over GF(2); k-wise independence; collision probability; Walsh-Hadamard transform; Reed-Muller codes; Lean 4; formal verification">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"ScholarlyArticle",
+ "headline":"The exact collision cost of low-weight uniformity for polynomial maps over GF(2)",
+ "author":{"@type":"Person","name":"Daniel Ayomide Shittu","affiliation":{"@type":"Organization","name":"Rowan University"}},
+ "datePublished":"2026-11-22",
+ "identifier":{"@type":"PropertyValue","propertyID":"DOI","value":"10.5281/zenodo.24427416"},
+ "url":"https://lizzolizard.github.io/quiet-collisions-math/",
+ "sameAs":["https://doi.org/10.5281/zenodo.24427416","https://github.com/LizzoLizard/quiet-collisions-math"],
+ "license":"https://creativecommons.org/licenses/by/4.0/",
+ "description":"A non-bijective map over GF(2) of degree at most k whose output is d-wise uniform has at least 2^max(⌈n/k⌉, d+1) more ordered collisions than a bijection, and this is attained. Exact answer also for compressing maps. Fully checked in Lean 4.",
+ "encoding":{"@type":"MediaObject","contentUrl":"https://lizzolizard.github.io/quiet-collisions-math/paper.pdf","encodingFormat":"application/pdf"},
+ "keywords":["Boolean functions","polynomial maps over GF(2)","k-wise independence","collision probability","Walsh-Hadamard transform","Reed-Muller codes","Lean 4","formal verification"],
+ "inLanguage":"en"}
+</script>
+<style>
+:root{--ink:#172b3a;--muted:#526372;--line:#dce4e9;--accent:#135e75;--card:#fff;--bg:#f5f8fa;--onaccent:#fff}
+@media (prefers-color-scheme:dark){:root{--ink:#e3ebf0;--muted:#9fb0bc;--line:#2a3a46;--accent:#6cc3dc;--card:#16222b;--bg:#0f181f;--onaccent:#0f181f}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.7 system-ui,-apple-system,"Segoe UI",sans-serif}
+main{max-width:860px;margin:auto;padding:56px 16px}
+header{border-bottom:1px solid var(--line);padding-bottom:26px;margin-bottom:26px}
+.eyebrow{font-size:.78rem;font-weight:700;letter-spacing:.13em;text-transform:uppercase;color:var(--accent)}
+h1{font-size:clamp(1.7rem,4.6vw,2.6rem);line-height:1.18;letter-spacing:-.03em;margin:10px 0 16px}
+h2{font-size:1.3rem;line-height:1.3;margin:34px 0 10px}
+p{margin:10px 0 14px}
+a{color:var(--accent);text-underline-offset:3px;overflow-wrap:anywhere}
+a:focus-visible{outline:3px solid var(--accent);outline-offset:3px}
+.byline,.small{color:var(--muted)}.small{font-size:.9rem}
+.links{display:flex;flex-wrap:wrap;gap:10px;margin-top:20px}
+.links a{border:1px solid var(--accent);padding:8px 14px;border-radius:6px;text-decoration:none;font-weight:600}
+.links a:first-child{background:var(--accent);color:var(--onaccent)}
+.claim{background:var(--card);border-left:4px solid var(--accent);padding:16px 20px;margin:22px 0}
+.math{font-family:Georgia,"Times New Roman",serif;font-size:clamp(1.1rem,3.4vw,1.45rem);font-weight:bold;margin:6px 0}
+pre{background:var(--card);border:1px solid var(--line);padding:14px;overflow-x:auto;font-size:.85rem;line-height:1.5}
+code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
+ul{padding-left:1.2em}li{margin:6px 0}
+footer{margin-top:40px;border-top:1px solid var(--line);padding-top:16px}
+@media(max-width:500px){main{padding:32px 16px}.links a{flex:1 1 100%;text-align:center}}
+</style>
+</head>
+<body>
+<main>
+<header>
+  <div class="eyebrow">Boolean functions · Pseudorandomness · Lean 4 · 2026</div>
+  <h1>The exact collision cost of low-weight uniformity for polynomial maps over GF(2)</h1>
+  <p class="byline"><strong>Daniel Ayomide Shittu</strong> · Rowan University · Preprint, November 2026</p>
+  <p class="small">DOI (all versions): <a href="https://doi.org/10.5281/zenodo.24427416">10.5281/zenodo.24427416</a></p>
+  <nav class="links" aria-label="Paper and code">
+    <a href="paper.pdf">Read the paper (PDF)</a>
+    <a href="explainer.pdf">Plain-language explainer</a>
+    <a href="https://github.com/LizzoLizard/quiet-collisions-math">Lean proof on GitHub</a>
+    <a href="https://doi.org/10.5281/zenodo.24427416">Zenodo archive</a>
+  </nav>
+</header>
+
+<section>
+  <h2>The result</h2>
+  <p>Let Q : F<sub>2</sub><sup>n</sup> → F<sub>2</sub><sup>n</sup> have coordinates of algebraic degree at most k.
+  Suppose its output on a uniform input is d-wise uniform (every Walsh coefficient on a nonzero mask of
+  weight ≤ d vanishes), but Q is not a bijection. Counting ordered collisions
+  C(Q) = #{(x, x′) : Q(x) = Q(x′)},</p>
+  <div class="claim">
+    <div class="math">min (C(Q) − 2<sup>n</sup>) = 2<sup>max(⌈n/k⌉, d+1)</sup></div>
+    <p class="small">for every k ≥ 1 and 0 ≤ d &lt; n</p>
+  </div>
+  <p>For compressing maps Q : F<sub>2</sub><sup>n</sup> → F<sub>2</sub><sup>m</sup> with 1 ≤ m ≤ n,</p>
+  <div class="claim">
+    <div class="math">min (C(Q) − 2<sup>2n−m</sup>) = 2<sup>max(2⌈n/k⌉ − m, ⌈n/k⌉, d+1)</sup></div>
+    <p class="small">for every k ≥ 1 and 0 ≤ d &lt; m; the answer jumps once m drops below ⌈n/k⌉</p>
+  </div>
+  <p>Both lower bounds are classical: Delsarte's support bound gives 2<sup>d+1</sup>, and
+  McEliece-type divisibility of degree-k signed sums gives 2<sup>⌈n/k⌉</sup>. The contribution is that
+  the larger of the two is always attained, by an explicit ring of gates with up to k−1 control bits on
+  each edge, and the exact answer for compressing maps. The stretching case m &gt; n remains open.</p>
+</section>
+
+<section>
+  <h2>In plain words</h2>
+  <p>Take a rule that scrambles n-bit strings into n-bit strings using simple polynomial formulas. If the
+  rule never sends two inputs to the same output, its output on a random input is perfectly random. Now
+  ask for less: the output only has to look perfectly random when you inspect any d output bits at a
+  time. Such a rule can have collisions. The theorem says exactly how few collisions it can get away
+  with, and gives a construction that achieves it.</p>
+</section>
+
+<section>
+  <h2>How it is checked</h2>
+  <ul>
+    <li>A complete Lean 4 proof of both exact minima, using only Lean's core (no Mathlib), with no
+    <code>sorry</code> and only the standard axioms <code>propext</code>, <code>Quot.sound</code> and
+    <code>Classical.choice</code>. Lower bounds hold for every eligible map; the attaining maps are
+    checked for degree, uniformity and collision count.</li>
+    <li>A Challenge/Solution comparator check: the two statements and every definition they use are
+    collected in two short files, and the proofs must match them exactly.</li>
+    <li>Independent Python checks: hundreds of ring constructions checked in every bucket and mask,
+    and exhaustive enumeration of all eligible maps in small cases.</li>
+  </ul>
+<pre><code>theorem exact_minimum (n k d : Nat) (hk : 0 &lt; k) (hd : d &lt; n) :
+    Attainable n k d (many (max ((n+k-1)/k) (d+1))) ∧
+    ∀ value, Attainable n k d value → many (max ((n+k-1)/k) (d+1)) ≤ value</code></pre>
+  <p>Clone the repository, install Lean 4.15.0, Python 3 and NumPy, and run <code>./verify.sh</code>
+  (under a minute). GitHub Actions runs the same check on every push.</p>
+</section>
+
+<section>
+  <h2>Cite</h2>
+<pre><code>@misc{shittu2026quiet,
+  author = {Shittu, Daniel Ayomide},
+  title  = {The exact collision cost of low-weight uniformity for polynomial maps over {GF(2)}},
+  year   = {2026},
+  doi    = {10.5281/zenodo.24427416},
+  note   = {Preprint. Paper and Lean 4 proof}
+}</code></pre>
+</section>
+
+<footer class="small">
+  <p>Claude (Anthropic) helped with the proofs, the Lean formalization and the write-up; Astra and
+  Gemini Neon also helped. Paper and explainer: CC BY 4.0. Code: MIT.</p>
+</footer>
+</main>
+</body>
+</html>
